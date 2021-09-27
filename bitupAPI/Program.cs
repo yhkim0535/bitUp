@@ -14,6 +14,7 @@ namespace bitupAPI
     {
         static public Jango jango;
         static public CandleStick candleStic;
+        static public VR _vr;
 
         private static int _매수금액 = 500000;
 
@@ -24,9 +25,70 @@ namespace bitupAPI
             //var U = new manager("accessKey 입력", "secretKey 입력");
             jango = new Jango();
             candleStic = new CandleStick();
+            _vr = new VR(10000000, 250000);
 
-            jsonTest();
+            //jsonTest();
             //jangoTest();
+            vrTest();
+        }
+
+        public static void vrTest()
+        {
+            var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            var candlesMinute = U.GetCandles_Minute("KRW-QTUM", manager.UpbitMinuteCandleType._30, to: DateTime.Now.AddMinutes(-2), count: 200);
+            var candleRoot = JArray.Parse(candlesMinute);
+
+            foreach (var item in candleRoot)
+            {
+                var market = item["market"];
+                var time = item["candle_date_time_kst"];
+                var open = item["opening_price"];
+                var high = item["high_price"];
+                var low = item["low_price"];
+                var close = item["trade_price"];
+                var timestamp = item["timestamp"];
+                var volumePrice = item["candle_acc_trade_price"];
+                var volume = item["candle_acc_trade_volume"];
+                //var unit = item["unit"];
+
+                var candle = new CandleData();
+                candle.market = market.ToString();
+                candle.candle_date_time_kst = time.ToString();
+                candle.open = Convert.ToDouble(open.ToString());
+                candle.high = Convert.ToDouble(high.ToString());
+                candle.low = Convert.ToDouble(low.ToString());
+                candle.close = Convert.ToDouble(close.ToString());
+                
+                //candle.timestamp = int.Parse(timestamp.ToString());
+                candle.volumePrice = Convert.ToDouble(volumePrice.ToString());
+                candle.volume = Convert.ToDouble(volume.ToString());                
+
+                candleStic.Candles.Add(candle);
+
+                //var jangoItem = new JangoData(new DateTime(), P(price), 1);
+            }
+
+            var count = candleStic.Candles.Count;
+            var preClose = 80000000.0;// candleStic.Candles[count - 1].close;
+
+            _vr.BuyDown(candleStic.Candles[count - 1].market, candleStic.Candles[count - 1].close, DateTime.Parse(candleStic.Candles[count - 1].candle_date_time_kst));
+
+            for (int i = 2; i < 200; i++)
+            {
+                var updown = (candleStic.Candles[count - i].close - preClose) / preClose * 100;
+
+                _vr.ComputV(candleStic.Candles[count - i].close);
+
+                //현재봉이 2%이상 상승시 매도주문
+                if (_vr.V > _vr.MaxV)
+                    _vr.BuyUp(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                else if (_vr.V < _vr.MinV)
+                    _vr.BuyDown(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+
+                preClose = candleStic.Candles[count - i].close;
+            }
+            
+
         }
 
         public static void jangoTest()
