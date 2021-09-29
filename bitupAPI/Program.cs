@@ -15,6 +15,7 @@ namespace bitupAPI
         static public Jango jango;
         static public CandleStick candleStic;
         static public VR _vr;
+        static public InfinityTrade _it;
 
         private static int _매수금액 = 500000;
 
@@ -26,16 +27,18 @@ namespace bitupAPI
             jango = new Jango();
             candleStic = new CandleStick();
             _vr = new VR(10000000, 250000);
+            _it = new InfinityTrade(10000000, 250000);
 
             //jsonTest();
             //jangoTest();
-            vrTest();
+            //vrTest();
+            InfinityTest();
         }
 
-        public static void vrTest()
+        public static void GetCandle()
         {
             var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
-            var candlesMinute = U.GetCandles_Minute("KRW-QTUM", manager.UpbitMinuteCandleType._30, to: DateTime.Now.AddMinutes(-2), count: 200);
+            var candlesMinute = U.GetCandles_Minute("KRW-BCHA", manager.UpbitMinuteCandleType._15, to: DateTime.Now.AddMinutes(-2), count: 200);
             var candleRoot = JArray.Parse(candlesMinute);
 
             foreach (var item in candleRoot)
@@ -58,37 +61,90 @@ namespace bitupAPI
                 candle.high = Convert.ToDouble(high.ToString());
                 candle.low = Convert.ToDouble(low.ToString());
                 candle.close = Convert.ToDouble(close.ToString());
-                
+
                 //candle.timestamp = int.Parse(timestamp.ToString());
                 candle.volumePrice = Convert.ToDouble(volumePrice.ToString());
-                candle.volume = Convert.ToDouble(volume.ToString());                
+                candle.volume = Convert.ToDouble(volume.ToString());
 
                 candleStic.Candles.Add(candle);
 
                 //var jangoItem = new JangoData(new DateTime(), P(price), 1);
             }
+        }
 
-            var count = candleStic.Candles.Count;
+        public static void InfinityTest()
+        {
+            GetCandle();
+
+            var count = 96;
             var preClose = 80000000.0;// candleStic.Candles[count - 1].close;
-
-            _vr.BuyDown(candleStic.Candles[count - 1].market, candleStic.Candles[count - 1].close, DateTime.Parse(candleStic.Candles[count - 1].candle_date_time_kst));
-
-            for (int i = 2; i < 200; i++)
+            //_it.BuyDown(candleStic.Candles[count].market, candleStic.Candles[count].close, DateTime.Parse(candleStic.Candles[count].candle_date_time_kst));
+            
+            for (int i = 1; i < count; i++)
             {
+                var close = candleStic.Candles[count - i].close;
                 var updown = (candleStic.Candles[count - i].close - preClose) / preClose * 100;
 
-                _vr.ComputV(candleStic.Candles[count - i].close);
+                _it.Update(close);
+                                
+                
+                if(_it.count == 0)
+                    _it.BuyDown(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                else if (_it.Get평단() < close && close < _it.Get평단() * 1.025 && _it.count < 20)
+                    _it.BuyUp(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                else if (close < _it.Get평단() * 1 && _it.count < 39.5)
+                    _it.BuyDown(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+
+                if(_it.count > 20)
+                {
+                    if(_it.Get수익률() > 2)
+                        _it.SellAll(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                    else if (_it.Get수익률() > 1)
+                        _it.SellHalf(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                }
+                else if(_it.count <= 20)
+                {
+                    if (_it.Get수익률() > 3)
+                        _it.SellAll(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                }
+                
+                preClose = candleStic.Candles[count - i].close;
+            }
+
+            var aa = ProfitHistory.Data;
+        }
+
+        public static void vrTest()
+        {
+            GetCandle();
+
+            //var count = candleStic.Candles.Count;
+            var count = 96;
+            var preClose = 80000000.0;// candleStic.Candles[count - 1].close;
+            var quantity = 5000000 / candleStic.Candles[count - 1].close;
+            //_vr.FirstBuy(candleStic.Candles[count - 1].market, candleStic.Candles[count - 1].close, quantity, DateTime.Parse(candleStic.Candles[count - 1].candle_date_time_kst));
+            _vr.FirstBuy(candleStic.Candles[count - 1].market, candleStic.Candles[count - 1].close, quantity, DateTime.Parse(candleStic.Candles[count - 1].candle_date_time_kst));
+
+
+            for (int i = 2; i < count; i++)
+            {
+                var close = candleStic.Candles[count - i].close;
+                var updown = (candleStic.Candles[count - i].close - preClose) / preClose * 100;
+
+                _vr.Update(close);
+
+                if( i % 10 == 0)
+                    _vr.NewCycle(close, 250000);
 
                 //현재봉이 2%이상 상승시 매도주문
-                if (_vr.V > _vr.MaxV)
-                    _vr.BuyUp(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
-                else if (_vr.V < _vr.MinV)
-                    _vr.BuyDown(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                if (_vr.Get평가금() > _vr.MaxV)
+                    _vr.Sell(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
+                else if (_vr.Get평가금() < _vr.MinV)
+                    _vr.Buy(candleStic.Candles[count - i].market, candleStic.Candles[count - i].close, DateTime.Parse(candleStic.Candles[count - i].candle_date_time_kst));
 
                 preClose = candleStic.Candles[count - i].close;
             }
             
-
         }
 
         public static void jangoTest()

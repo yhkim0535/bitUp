@@ -13,7 +13,7 @@ namespace bitupAPI
     /// </summary>
     public class Jango
     {
-        public List<JangoData> Data { get; set; }
+        public List<OrderData> Data { get; set; }
 
         public double CurrentPrice { get; set; }
 
@@ -47,22 +47,22 @@ namespace bitupAPI
 
         public Jango()
         {
-            Data = new List<JangoData>();
+            Data = new List<OrderData>();
         }
 
-        public void Add (JangoData data)
+        public void Add (OrderData data)
         {
             Data.Add(data);
         }
 
-        public void Add(List<JangoData> data)
+        public void Add(List<OrderData> data)
         {
             Data.AddRange(data);
         }
 
         public void Buy(string market, double close, double quantity, DateTime time)
         {
-            var buy = new JangoData(OrderType.Purchase, market, close, quantity, time);
+            var buy = new OrderData(OrderType.Purchase, market, close, quantity, time);
             Data.Add(buy);
 
             Update(close);
@@ -73,12 +73,8 @@ namespace bitupAPI
             if (Quantity < quantity)
                 return;
             
-            var sell = new JangoData(OrderType.Sell, market, close, quantity, time);
-            Data.Add(sell);
-
-            Update(close);
-
             var 수익률 = Math.Round((((close / AvgBuyprice) - 1) * 100) - Fee, 2);
+            var 수익금 = Math.Round((close * quantity) * (수익률 / 100));
 
             var profit = new ProfitHistoryData
             {
@@ -87,11 +83,16 @@ namespace bitupAPI
                 SellPrice = close,
                 Time = time,
                 ProfitRatio = 수익률,
-                Profit = Math.Round((close * quantity) * (수익률 / 100)),
+                Profit = 수익금,
                 TotalSellPrice = close * quantity,
             };
 
             ProfitHistory.Add(profit);
+
+            var sell = new OrderData(OrderType.Sell, market, close, quantity, time, 수익금, 수익률);
+            Data.Add(sell);
+
+            Update(close);
         }
 
         public void Update(double close)
@@ -116,12 +117,32 @@ namespace bitupAPI
                 }
             }
 
-            Quantity = Math.Round(Quantity, 5);
+            Quantity = Math.Round(Quantity, 8);
             var 총매수금 = Data.Where(x => x.Type == OrderType.Purchase).Sum(x => x.Price * x.Quantity);
             var 총매수량 = Data.Where(x => x.Type == OrderType.Purchase).Sum(x => x.Quantity);
+            var 총매도금 = Data.Where(x => x.Type == OrderType.Sell).Sum(x => x.Price * x.Quantity);
+            var 총매도량 = Data.Where(x => x.Type == OrderType.Sell).Sum(x => x.Quantity);
+
+            var 총매매금 = 총매수금 - 총매도금;
+            var 총매매량 = Math.Round(총매수량 - 총매도량, 8);
             //var 평단 = 총매수금 / 총매수량;
             //AvgBuyprice = (TotalBuyPrice / Quantity);
-            AvgBuyprice = Math.Round(총매수금 / 총매수량);
+            //AvgBuyprice = Math.Round(총매수금 / 총매수량);
+
+            if (총매매량 == 0)
+            {
+                AvgBuyprice = 0;
+                TotalBuyPrice = 0;
+                평가금액 = 0;
+                Profit = 0;
+                _profitRatio = 0;
+                실현손익 = ProfitHistory.Profit;
+                return;
+            }
+
+
+            AvgBuyprice = Math.Round(총매매금 / 총매매량);
+
             TotalBuyPrice = AvgBuyprice * Quantity;
             평가금액 = Math.Round(CurrentPrice * Quantity);
 
