@@ -41,30 +41,91 @@ namespace bitupAPI
         {
             Rsi = new List<RsiData>();
 
-            for (int i=1; i<data.Count; i++)
+            for (int i=0; i<data.Count - 1; i++)
             {
-                var difference = data[i].close - data[i - 1].close;
+                var rsi = new RsiData();
+                var difference = data[i].close - data[i + 1].close;
+
                 if (difference >= 0)
-                    Rsi[i].U = difference;
+                    rsi.U = difference;
                 else
-                    Rsi[i].D = difference;
+                    rsi.D = difference;
+
+                rsi.Date = DateTime.Parse(data[i].candle_date_time_kst);
+                Rsi.Add(rsi);
             }
 
-            for(int i=0; i<data.Count; i++)
+            for (int i = 0; i < data.Count; i++)
             {
-                Rsi[0].AU = (int)Rsi.Skip(stdDay).Take(period).Average(x => x.U);
-                Rsi[0].AD = (int)Rsi.Skip(stdDay).Take(period).Average(x => x.D);
+                if (data.Count < period + i)
+                    break;
+
+                Rsi[i].AU = Math.Abs(Rsi.Skip(i).Take(period).Average(x => x.U));
+                Rsi[i].AD = Math.Abs(Rsi.Skip(i).Take(period).Average(x => x.D));
             }
 
             Rsi.ForEach(x => x.RS = x.AU / x.AD);
-            Rsi.ForEach(x => x.Value = x.RS / (1 + x.RS));
-            //Rsi.ForEach(x=> x.Signal = x.Value.)
+            Rsi.ForEach(x => x.Value = 100.0 - (100.0 / (1 + x.RS)));
+            //Rsi.ForEach(x => x.Value = x.RS / (1 + x.RS));
+
+            var rs1 = Rsi[0].AU / Rsi[0].AD;
+            var value1 = 100.0 - (100.0 / (1 + rs1));
+
+            var value2 = rs1 / (1 + rs1);
+            var value3 = Rsi[0].AU / (Rsi[0].AU + Rsi[0].AD);
+
 
         }
 
-        public static void GetRsi()
+        private static double RsiAu(List<RsiData> data, int period, int stdDay = 0)
         {
+            if (data == null)
+                return 0;
 
+            if (data.Count < period + stdDay)
+                return 0;
+
+            return data.Skip(stdDay).Take(period).Average(x => x.U);
+        }
+
+        private static double RsiAd(List<RsiData> data, int period, int stdDay = 0)
+        {
+            if (data == null)
+                return 0;
+
+            if (data.Count < period + stdDay)
+                return 0;
+
+            return data.Skip(stdDay).Take(period).Average(x => x.D);
+        }
+
+        public static void RsiTest(List<CandleData> data, int period)
+        {
+            var gain = 0.0;
+            var loss = 0.0;
+
+            for (int i = data.Count - 1; data.Count >= period && (i > data.Count - 1 - period); i--)
+
+            {
+                var current = data[i].close;
+                var prevday = data[i - 1].close;
+                
+                if (current < prevday)
+                    gain += prevday - current;
+                else if (current > prevday)
+                    loss += current - prevday;
+
+            }
+
+            var avggain = gain / period;
+            var avgloss = loss / period;
+            var rs = avggain / avgloss;
+            var rsi = 100 - (100 / (1 + rs));
+        }
+
+        public static void GetRsi(List<CandleData> data, int period, int stdDay = 0)
+        {
+            ComputeRsiParam(data, period, stdDay);
         }
     }
 }

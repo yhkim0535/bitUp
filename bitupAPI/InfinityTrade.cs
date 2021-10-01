@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace bitupAPI
 {
+    /// <summary>
+    /// 무한 백테스트
+    /// </summary>
     public class InfinityTrade
     {
         public JangoBoard _jango;

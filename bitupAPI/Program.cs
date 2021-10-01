@@ -38,7 +38,7 @@ namespace bitupAPI
         public static void GetCandle()
         {
             var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
-            var candlesMinute = U.GetCandles_Minute("KRW-BCHA", manager.UpbitMinuteCandleType._15, to: DateTime.Now.AddMinutes(-2), count: 200);
+            var candlesMinute = U.GetCandles_Minute("KRW-BCH", manager.UpbitMinuteCandleType._15, to: DateTime.Now.AddMinutes(-2), count: 200);
             var candleRoot = JArray.Parse(candlesMinute);
 
             foreach (var item in candleRoot)
@@ -70,6 +70,8 @@ namespace bitupAPI
 
                 //var jangoItem = new JangoData(new DateTime(), P(price), 1);
             }
+
+            //TechnicalAnalysis.GetRsi(candleStic.Candles, 14);
         }
 
         public static void InfinityTest()
