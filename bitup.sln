@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bitup", "bitup\bitup.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bitupAPI", "bitupAPI\bitupAPI.csproj", "{B0A5C0BC-025F-4E36-97F1-C34E2A08C81F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bitupTrade", "bitupTrade\bitupTrade.csproj", "{7ED2FBBA-AF44-4C35-BA57-ADEFE942F393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bitup.Cmm", "bitup.Cmm\bitup.Cmm.csproj", "{BE58CEA3-A214-4CD3-B7E1-4EE2B1C174DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B0A5C0BC-025F-4E36-97F1-C34E2A08C81F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0A5C0BC-025F-4E36-97F1-C34E2A08C81F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0A5C0BC-025F-4E36-97F1-C34E2A08C81F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ED2FBBA-AF44-4C35-BA57-ADEFE942F393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ED2FBBA-AF44-4C35-BA57-ADEFE942F393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ED2FBBA-AF44-4C35-BA57-ADEFE942F393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ED2FBBA-AF44-4C35-BA57-ADEFE942F393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE58CEA3-A214-4CD3-B7E1-4EE2B1C174DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE58CEA3-A214-4CD3-B7E1-4EE2B1C174DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE58CEA3-A214-4CD3-B7E1-4EE2B1C174DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE58CEA3-A214-4CD3-B7E1-4EE2B1C174DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

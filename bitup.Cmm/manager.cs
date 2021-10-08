@@ -1,18 +1,39 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
-using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens.Jwt;
 
-namespace bitupAPI
+namespace bitup.Cmm
 {
-    public class manager
+    /// <summary>
+    /// NewtonJson 버전, IdentityModel 버전 체크할것
+    /// </summary>
+    public class Manager
     {
+        private static Manager _instance;
+
+        public static Manager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                    _instance = new Manager();
+                return _instance;
+            }
+        }
+
         public MyHttpClient httpClient;
-        public manager(string accessKey, string secretKey)
+        //public Manager(string accessKey, string secretKey)
+        //{
+        //    this.httpClient = new MyHttpClient(accessKey, secretKey);
+        //}
+
+        public void SetKeys(string accessKey, string secretKey)
         {
             this.httpClient = new MyHttpClient(accessKey, secretKey);
         }

@@ -1,12 +1,12 @@
-﻿using bitupAPI.Enum;
-using bitupAPI.Model;
+﻿using bitup.Cmm.Enum;
+using bitup.Cmm.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bitupAPI
+namespace bitup.Cmm
 {
     public static class ProfitHistory
     {

@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using bitupAPI.Model;
-using Newtonsoft.Json;
+using bitup.Cmm;
+using bitup.Cmm.Model;
 using Newtonsoft.Json.Linq;
 
 namespace bitupAPI
@@ -17,7 +13,7 @@ namespace bitupAPI
         static public VR _vr;
         static public InfinityTrade _it;
 
-        private static int _매수금액 = 500000;
+        private static int _매수금액 = 6000;
 
         /// Access key - 1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx
         /// Secret key - OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P
@@ -32,14 +28,18 @@ namespace bitupAPI
             //jsonTest();
             //jangoTest();
             //vrTest();
-            InfinityTest();
+            //InfinityTest();
+
+            basic();
         }
 
         public static void GetCandle()
         {
-            var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
-            var candlesMinute = U.GetCandles_Minute("KRW-BCH", manager.UpbitMinuteCandleType._15, to: DateTime.Now.AddMinutes(-2), count: 200);
+            Manager.Instance.SetKeys("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            //var U = new Manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            var candlesMinute = Manager.Instance.GetCandles_Minute("KRW-BCH", Manager.UpbitMinuteCandleType._1, to: DateTime.Now.AddMinutes(0), count: 200);
             var candleRoot = JArray.Parse(candlesMinute);
+            //candleRoot.First["candle_date_time_kst"]
 
             foreach (var item in candleRoot)
             {
@@ -81,13 +81,15 @@ namespace bitupAPI
             var count = 96;
             var preClose = 80000000.0;// candleStic.Candles[count - 1].close;
             //_it.BuyDown(candleStic.Candles[count].market, candleStic.Candles[count].close, DateTime.Parse(candleStic.Candles[count].candle_date_time_kst));
-            
+            var market = candleStic.Candles[0].market;
+
+
             for (int i = 1; i < count; i++)
             {
                 var close = candleStic.Candles[count - i].close;
                 var updown = (candleStic.Candles[count - i].close - preClose) / preClose * 100;
 
-                _it.Update(close);
+                _it.Update(market, close);
                                 
                 
                 if(_it.count == 0)
@@ -112,6 +114,12 @@ namespace bitupAPI
                 
                 preClose = candleStic.Candles[count - i].close;
             }
+
+            var span = new TimeSpan(_it._jango.Data[0].Time.Hour, _it._jango.Data[0].Time.Minute, _it._jango.Data[0].Time.Second - 3);
+            var term = new TimeSpan(0, 0, 45);
+            var sub = span.Minutes % 15;
+            var result = (sub == 14 && span.Seconds > term.Seconds);
+            
 
             var aa = ProfitHistory.Data;
         }
@@ -170,7 +178,8 @@ namespace bitupAPI
 
         public static void jsonTest()
         {
-            var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            Manager.Instance.SetKeys("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            //var U = new Manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
 
             #region 자산
             //// 자산 조회
@@ -196,7 +205,7 @@ namespace bitupAPI
             //Console.WriteLine(candlesDay);
 
 
-            var candlesMinute = U.GetCandles_Minute("KRW-QTUM", manager.UpbitMinuteCandleType._30, to: DateTime.Now.AddMinutes(-2), count: 200);
+            var candlesMinute = Manager.Instance.GetCandles_Minute("KRW-QTUM", Manager.UpbitMinuteCandleType._30, to: DateTime.Now.AddMinutes(-2), count: 200);
             //var candlesMinute = U.GetCandles_Day("KRW-BTC", to: DateTime.Now.AddDays(0), count: 200);
 
             //var test = JObject.Parse(candlesMinute);
@@ -302,11 +311,12 @@ namespace bitupAPI
 
         public static void basic()
         {
-            var U = new manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            Manager.Instance.SetKeys("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
+            //var U = new Manager("1rZ9cA0JYqzgFgH82JUmmEjPXGTvNwcd5YarExVx", "OVl6JEbKnhHlTSZLYMkbpDdhs3mY6jytbmxxj71P");
             
             #region 자산
             // 자산 조회
-            var account = U.GetAccount();
+            var account = Manager.Instance.GetAccount();
             var root = JArray.Parse(account);
             foreach (var item in root)
             {
@@ -317,24 +327,27 @@ namespace bitupAPI
 
             #region 주문
             // 주문 가능 정보
-            var orderChance = U.GetOrderChance("KRW-BTC");
+            var orderChance = Manager.Instance.GetOrderChance("KRW-BTC");
             //var root = JObject.Parse(orderChance);
             Console.WriteLine(orderChance);
 
             // 개별 주문 조회
-            var order = U.GetOrder("주문 uuid");
+            var order = Manager.Instance.GetOrder("주문 uuid");
             Console.WriteLine(order);
 
             // 주문 리스트 조회
-            var allOrder = U.GetAllOrder();
+            var allOrder = Manager.Instance.GetAllOrder();
             Console.WriteLine(allOrder);
 
             // 주문하기
-            var makeOrder = U.MakeOrder("KRW-BTC", manager.UpbitOrderSide.bid, 0.001m, 5000000);
-            Console.WriteLine(makeOrder);
+            //var makeOrder = U.MakeOrder("KRW-BTC", manager.UpbitOrderSide.bid, 0.0001m, 5780000);
+            //var makeOrder = Manager.Instance.MakeOrder("KRW-BTC", Manager.UpbitOrderSide.bid, 0.0001m, 57800000);
+            //Console.WriteLine(makeOrder);
+            OrderManager.Instance.Buy("KRW-BTC", 52800000, 0.0001, DateTime.Now);
 
             // 주문 취소
-            Console.WriteLine(U.CancelOrder("주문 uuid"));
+            var cancelOrder = Manager.Instance.CancelOrder("주문 uuid");
+            Console.WriteLine(cancelOrder);
             #endregion
 
             #region 시세 정보
@@ -342,23 +355,26 @@ namespace bitupAPI
             //Console.WriteLine(U.GetMarkets());
 
             // 캔들(분, 일, 주, 월) 조회
-            var candlesMinute = U.GetCandles_Minute("KRW-BTC", manager.UpbitMinuteCandleType._1, to: DateTime.Now.AddMinutes(-2), count: 2);
-            var candlesDay = U.GetCandles_Day("KRW-BTC", to: DateTime.Now.AddDays(-2), count: 2);
+            var candlesMinute = Manager.Instance.GetCandles_Minute("KRW-BTC", Manager.UpbitMinuteCandleType._1, to: DateTime.Now.AddMinutes(-2), count: 2);
+            var candlesDay = Manager.Instance.GetCandles_Day("KRW-BTC", to: DateTime.Now.AddDays(-2), count: 2);
             Console.WriteLine(candlesMinute);
             Console.WriteLine(candlesDay);
-            Console.WriteLine(U.GetCandles_Week("KRW-BTC", to: DateTime.Now.AddDays(-14), count: 2));
-            Console.WriteLine(U.GetCandles_Month("KRW-BTC", to: DateTime.Now.AddMonths(-2), count: 2));
+            Console.WriteLine(Manager.Instance.GetCandles_Week("KRW-BTC", to: DateTime.Now.AddDays(-14), count: 2));
+            Console.WriteLine(Manager.Instance.GetCandles_Month("KRW-BTC", to: DateTime.Now.AddMonths(-2), count: 2));
             
             // 당일 체결 내역 조회
-            var ticks = U.GetTicks("KRW-BTC", count: 2);
+            var ticks = Manager.Instance.GetTicks("KRW-BTC", count: 5);
             Console.WriteLine(ticks);
 
             // 현재가 정보 조회
-            var ticker = U.GetTicker("KRW-BTC,KRW-ETH");
+            //var ticker = Manager.Instance.GetTicker("KRW-BTC,KRW-ETH");
+            var ticker = Manager.Instance.GetTicker("KRW-BTC");
             Console.WriteLine(ticker);
+            //var tickerChar = JArray.Parse(ticker)[0]["trade_time_kst"].ToString();//.Substring(4, 2)
+            //var currentTime2 = DateTime.ParseExact(tickerChar, "HHmmss", CultureInfo.InvariantCulture);
 
             // 시세 호가 정보(Orderbook) 조회
-            var orderBook = U.GetOrderbook("KRW-BTC,KRW-ETH");
+            var orderBook = Manager.Instance.GetOrderbook("KRW-BTC,KRW-ETH");
             Console.WriteLine(orderBook);
             #endregion
 

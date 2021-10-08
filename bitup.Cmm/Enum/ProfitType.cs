@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bitupAPI.Enum
+namespace bitup.Cmm.Enum
 {
     public enum ProfitType : int
     {

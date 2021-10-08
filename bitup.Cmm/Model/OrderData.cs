@@ -1,11 +1,11 @@
-﻿using bitupAPI.Enum;
+﻿using bitup.Cmm.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bitupAPI
+namespace bitup.Cmm.Model
 {
     /// <summary>
     /// OrderData
@@ -33,6 +33,8 @@ namespace bitupAPI
         public double ProfitRatio { get; set; }
 
         public double Profit { get; set; }
+        public string Uuid { get; set; }
+
 
         public OrderData(double price, double quantity, DateTime time)
         {            
@@ -42,15 +44,16 @@ namespace bitupAPI
             총매수금액 = price * quantity;
         }
 
-        public OrderData(OrderType type, string market, double price, double quantity, DateTime time)
+        public OrderData(OrderType type, string market, double price, double quantity, DateTime time, string uuid = "")
         {
             Type = type;
             Market = market;
             Price = price;
             Quantity = quantity;
             Time = time;
+            Uuid = uuid;
 
-            if(type == OrderType.Purchase)
+            if (type == OrderType.Purchase)
                 총매수금액 = price * quantity;
             else if (type == OrderType.Sell)
                 총매도금액 = price * quantity;

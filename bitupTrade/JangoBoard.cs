@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using bitup.Cmm;
 
-namespace bitupAPI
+namespace bitupTrade
 {
     public class JangoBoard
     {

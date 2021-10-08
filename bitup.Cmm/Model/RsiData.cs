@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bitupAPI.Model
+namespace bitup.Cmm.Model
 {
     public class RsiData
     {

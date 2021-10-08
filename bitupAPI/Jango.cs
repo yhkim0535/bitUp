@@ -1,10 +1,11 @@
-﻿using bitupAPI.Enum;
-using bitupAPI.Model;
+﻿using bitup.Cmm.Model;
+using bitup.Cmm.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using bitup.Cmm;
 
 namespace bitupAPI
 {
