@@ -32,7 +32,12 @@ namespace bitupTrade
             
             var respons = JObject.Parse(makeOrder);
             if (respons["uuid"] == null)
+            {
+                Console.WriteLine("=====[매수주문 실패]=====");
+                Console.WriteLine("[{0}]", respons["error"]["message"]);
                 return;
+            }
+                
 
             var buy = new OrderData(OrderType.Purchase, market, close, quantity, time, respons["uuid"].ToString());
             ReceiveOrderDataHandler?.Invoke(this, buy);
@@ -44,11 +49,15 @@ namespace bitupTrade
             //ReceiveOrderDataHandler?.Invoke(this, sell);
 
             var makeOrder = Manager.Instance.MakeOrder(market, Manager.UpbitOrderSide.ask, Convert.ToDecimal(quantity), Convert.ToDecimal(close));
-
-            if (makeOrder == null)
-                return;
-
+                        
             var respons = JObject.Parse(makeOrder);
+            if (respons["uuid"] == null)
+            {
+                Console.WriteLine("=====[매도주문 실패]=====");
+                Console.WriteLine("[{0}]", respons["error"]["message"]);
+                return;
+            }
+
             var sell = new OrderData(OrderType.Purchase, market, close, quantity, time, respons["uuid"].ToString());
             ReceiveOrderDataHandler?.Invoke(this, sell);
         }

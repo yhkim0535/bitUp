@@ -112,6 +112,9 @@ namespace bitupTrade
             if (Quantity < quantity)
                 return;
 
+            if (Data.Count == 0)
+                return;
+
             //1. 수익률 계산후 수익금 계산
             //2. 총 매수금액 - 총매도금액 으로 수익금 계산.
             var 수익률 = Math.Round((((close / AvgBuyprice) - 1) * 100) - Fee, 2);

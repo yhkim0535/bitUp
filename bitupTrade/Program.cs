@@ -25,7 +25,7 @@ namespace bitupTrade
         private static bool _firstBuy;
         static void Main(string[] args)
         {
-            Ticker = "KRW-MVL";
+            Ticker = "KRW-OMG";
             _preTime = new DateTime(2000, 1, 1, 9, 0, 0);
             
 
@@ -79,7 +79,7 @@ namespace bitupTrade
             var tickerChar = JArray.Parse(ticker)[0]["trade_time_kst"].ToString();//.Substring(4, 2)
             var currentTime = DateTime.ParseExact(tickerChar, "HHmmss", CultureInfo.InvariantCulture);
 
-            var barInterval = 5;
+            var barInterval = 15;
             var subMinute = currentTime.Minute % barInterval;
             var result = (subMinute == barInterval - 1 && currentTime.Second > 45);//15분봉기준 현재시간이 14분 45초가 넘을경우 매수 진행
 
@@ -100,6 +100,7 @@ namespace bitupTrade
             //if (_preTime >= candleTime)
             //    return;
 
+
             if (!result)
             {
                 _firstBuy = false;
@@ -110,8 +111,6 @@ namespace bitupTrade
             if (_firstBuy) return;
 
             
-            
-
 
             //close = hoga;
 
@@ -121,6 +120,8 @@ namespace bitupTrade
                 _it.BuyUp(market, close, candleTime);
             else if (close < _it.Get평단() * 1 && _it.count < 39.5)
                 _it.BuyDown(market, close, candleTime);
+            else
+                Console.WriteLine("[{0}] - {1} 해당조건 없음", _it.count, currentTime);
 
             if (_it.count > 20)
             {
@@ -135,7 +136,9 @@ namespace bitupTrade
                     _it.SellAll(market, close, candleTime);
             }
 
-            Console.WriteLine("[{0}] - {1} : 매수 주문 [{2}]", _it.count, currentTime, hoga);
+            Console.WriteLine("[{0}] - {1} : 매수 주문 [{2}.  Profit: {3}({4})]", _it.count, currentTime, hoga, _it._jango.Profit, _it.Get수익률());
+
+            
 
             //_preTime = candleTime;
             _firstBuy = true;
