@@ -22,10 +22,10 @@ namespace bitupTrade
         private static Timer _timer;
         private static DateTime _preTime;
 
-        private static bool _firstBuy;
+        private static bool _firstOrdered;
         static void Main(string[] args)
         {
-            Ticker = "KRW-OMG";
+            Ticker = "KRW-STRAX";
             _preTime = new DateTime(2000, 1, 1, 9, 0, 0);
             
 
@@ -103,12 +103,12 @@ namespace bitupTrade
 
             if (!result)
             {
-                _firstBuy = false;
+                _firstOrdered = false;
                 return;
             }
             
 
-            if (_firstBuy) return;
+            if (_firstOrdered) return;
 
             
 
@@ -121,7 +121,7 @@ namespace bitupTrade
             else if (close < _it.Get평단() * 1 && _it.count < 39.5)
                 _it.BuyDown(market, close, candleTime);
             else
-                Console.WriteLine("[{0}] - {1} 해당조건 없음", _it.count, currentTime);
+                Console.WriteLine("[{0}] - {1} 매수조건 없음", _it.count, currentTime);
 
             if (_it.count > 20)
             {
@@ -136,12 +136,12 @@ namespace bitupTrade
                     _it.SellAll(market, close, candleTime);
             }
 
-            Console.WriteLine("[{0}] - {1} : 매수 주문 [{2}.  Profit: {3}({4})]", _it.count, currentTime, hoga, _it._jango.Profit, _it.Get수익률());
+            //Console.WriteLine("[{0}] - {1} : 매수 주문 [{2}.  Profit: {3}({4})]", _it.count, currentTime, hoga, _it._jango.Profit, _it.Get수익률());
 
-            
+
 
             //_preTime = candleTime;
-            _firstBuy = true;
+            _firstOrdered = true;
         }
 
         

@@ -179,7 +179,7 @@ namespace bitupTrade
             //ProfitRatio = Math.Round((((CurrentPrice / AvgBuyprice) - 1) * 100) - Fee, 2);
             //Profit = ((AvgBuyprice - CurrentPrice) * Quantity) * 0.0005f;
             //Profit = Math.Round(TotalBuyPrice * (ProfitRatio / 100));
-            Profit = (CurrentPrice - AvgBuyprice) * Quantity;
+            Profit = Math.Round((CurrentPrice - AvgBuyprice) * Quantity, 2);
             _profitRatio = Math.Round(((Profit / TotalBuyPrice) * 100) - Fee, 2);
 
             실현손익 = ProfitHistory.Profit;

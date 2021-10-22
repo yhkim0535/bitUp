@@ -58,6 +58,8 @@ namespace bitupTrade
             count += 0.5;
 
             OrderManager.Instance.Buy(market, close, quantity, time);
+
+            Console.WriteLine("[{0}] - {1} : 절반매수 주문 [{2}.  Profit: {3}({4})]", count, time, close, _jango.Profit, Get수익률());
         }
 
         /// <summary>
@@ -75,6 +77,8 @@ namespace bitupTrade
             count += 1;
 
             OrderManager.Instance.Buy(market, close, quantity, time);
+
+            Console.WriteLine("[{0}] - {1} : 1회매수 주문 [{2}.  Profit: {3}({4})]", count, time, close, _jango.Profit, Get수익률());
         }
 
         public void SellHalf(string market, double close, DateTime time)
@@ -84,6 +88,8 @@ namespace bitupTrade
             _jango.Sell(market, close, quantity, time);
             count /= 2;
             OrderManager.Instance.Sell(market, close, quantity, time);
+
+            Console.WriteLine("[{0}] - {1} : Half매도 주문 [{2}.  Profit: {3}({4})]", count, time, close, _jango.Profit, Get수익률());
         }
 
         public void SellAll(string market, double close, DateTime time)
@@ -93,6 +99,8 @@ namespace bitupTrade
             _jango.Sell(market, close, quantity, time);
             count = 0;
             OrderManager.Instance.Sell(market, close, quantity, time);
+
+            Console.WriteLine("[{0}] - {1} : All매도 주문 [{2}.  Profit: {3}({4})]", count, time, close, _jango.Profit, Get수익률());
         }
     }
 }
